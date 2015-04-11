@@ -1,0 +1,5 @@
+*.gem
+.yardoc
+
+coverage.data/
+coverage/
