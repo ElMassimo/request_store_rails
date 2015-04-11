@@ -1,19 +1,18 @@
-RequestStore (Rails)
+RequestLocals
 =====================
 [![Gem Version](https://badge.fury.io/rb/request_store_rails.svg)](http://badge.fury.io/rb/request_store_rails)
 [![Build Status](https://travis-ci.org/ElMassimo/request_store_rails.svg)](https://travis-ci.org/ElMassimo/request_store_rails)
 [![Test Coverage](https://codeclimate.com/github/ElMassimo/request_store_rails/badges/coverage.svg)](https://codeclimate.com/github/ElMassimo/request_store_rails)
-[![Code Climate](https://codeclimate.com/github/ElMassimo/request_store_rails.png)](https://codeclimate.com/github/ElMassimo/request_store_rails)
+[![Code Climate](https://codeclimate.com/github/ElMassimo/request_store_rails/badges/gpa.svg)](https://codeclimate.com/github/ElMassimo/request_store_rails)
 [![Inline docs](http://inch-ci.org/github/ElMassimo/request_store_rails.svg)](http://inch-ci.org/github/ElMassimo/request_store_rails)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ElMassimo/request_store_rails/blob/master/LICENSE.txt)
-<!-- [![Coverage Status](https://coveralls.io/repos/ElMassimo/request_store_rails/badge.png)](https://coveralls.io/r/ElMassimo/request_store_rails) -->
 
 If you have ever needed to use a global variable in Rails, you know it sucks.
 
 One of the usual tricks is to go for `Thread.current`, or if you have done your
 homework, to use the awesome [`request_store`](https://github.com/steveklabnik/request_store).
 
-```
+```ruby
 # Using Thread.current
 def self.foo
   Thread.current[:foo] ||= 0
@@ -78,11 +77,11 @@ use RequestStoreRails::Middleware
 ```
 
 ## Multi-Threading
-The middleware sets a thread-local variable `:request_id` in `Thread.current` for
-the main thread that is executing a request.
+The middleware in the gem sets a thread-local variable `:request_id` in
+`Thread.current` for the main thread that is executing the request.
 
-If you need to spawn threads within a concurrent server (usually because of
-legacy issues), all you need to do is to make sure that the `:request_id`
+If you need to spawn threads within a server that is already using thread-based
+concurrency, all you need to do is to make sure that the `:request_id`
 variable is set for your threads, and you will be able to access the
 `RequestLocals` as usual.
 
@@ -111,6 +110,13 @@ ThreadWithContext.new {
 The gem does not provide such construct to avoid name collisions, you are free
 to reuse the snippet above and adjust it to match your use case.
 
+If you are feeling adventurous, you could try using this [fire and forget script](https://gist.github.com/ElMassimo/e2f99848db6a415f1aaa) and make all of your threads request aware, or should I say _prepend and forget_ :smile:? Probably not something to be used in a production environment, but whatever floats your boat :boat:
+
+## Special Thanks
+The inspiration for this gem, tests, and a big part of the readme were borrowed
+from the really cool [`request_store`](https://github.com/steveklabnik/request_store) gem.
+Thanks [Steve](https://github.com/steveklabnik) :smiley:
+
 ## Contributing
 
 1. Fork it
@@ -121,15 +127,10 @@ to reuse the snippet above and adjust it to match your use case.
 
 Don't forget to run the tests with `rake`.
 
-## Special Thanks
-The inspiration for this gem, tests, and a big part of the readme were borrowed
-from the really cool [`request_store`](https://github.com/steveklabnik/request_store) gem.
-Thanks [Steve](https://github.com/steveklabnik) :smiley:
-
 License
 --------
 
-    Copyright (c) 2014 Máximo Mussini
+    Copyright (c) 2015 Máximo Mussini
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
