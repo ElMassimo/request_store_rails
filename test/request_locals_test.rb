@@ -65,7 +65,7 @@ class RequestLocalsTest < Minitest::Unit::TestCase
       Thread.current[:request_id] = :different_id
       assert_empty RequestLocals.store
 
-      RequestLocals[:foo] = :beer
+      RequestLocals.fetch(:foo) { :beer }
     }.join
 
     assert_equal :bar, global_store[:awesome_id][:foo]
@@ -78,7 +78,7 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_empty global_store
 
     Thread.current[:request_id] = :awesome_id
-    RequestLocals[:foo] = :bar
+    RequestLocals.fetch(:foo) { :bar }
 
     Thread.new {
       Thread.current[:request_id] = :awesome_id
