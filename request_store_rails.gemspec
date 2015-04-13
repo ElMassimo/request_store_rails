@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'request_store_rails'
-  s.version = '0.0.2'
+  s.version = '0.0.3'
   s.licenses = ['MIT']
   s.summary = 'Per-request global storage for Rails'
   s.description = 'RequestLocals gives you per-request global storage in Rails'

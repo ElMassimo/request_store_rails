@@ -1,6 +1,6 @@
 require 'singleton'
+require 'forwardable'
 require 'thread_safe'
-require 'active_support/core_ext/module/delegation'
 
 # Public: Provides per-request global storage, by offering an interface that is
 # very similar to Rails.cache, or Hash.
@@ -12,11 +12,13 @@ require 'active_support/core_ext/module/delegation'
 # will clear the request local variables after each request.
 class RequestLocals
   include Singleton
+  extend Forwardable
 
   class << self
+    extend Forwardable
 
     # Public: Public methods of RequestLocals, they are delegated to the Singleton instance.
-    delegate :clear!, :clear_all!, :[], :[]=, :fetch, :delete, :exist?, :empty?, to: :instance
+    def_delegators :instance, :clear!, :clear_all!, :[], :[]=, :fetch, :delete, :exist?, :empty?
 
     # Public: There is no accounting for taste, RequestLocals[:foo] vs RequestLocals.store[:foo]
     alias_method :store, :instance
@@ -26,7 +28,7 @@ class RequestLocals
   end
 
   # Internal: Methods of the RequestLocals instance, delegated to the request-local structure.
-  delegate :[], :[]=, :delete, :empty?, to: :store
+  def_delegators :store, :[], :[]=, :delete, :empty?
 
   def initialize
     @cache = ThreadSafe::Cache.new
