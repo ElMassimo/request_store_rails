@@ -59,7 +59,7 @@ class RequestLocals
   # Returns an existing value for the key is found, otherwise it returns the
   # value yielded by the block.
   def fetch(key, &block)
-    store.fetch_or_store(key, &block)
+    store.compute_if_absent(key, &block)
   end
 
 protected
@@ -69,7 +69,7 @@ protected
   #
   # Returns a ThreadSafe::Cache.
   def store
-    @cache.fetch_or_store(current_request_id) { new_store }
+    @cache.compute_if_absent(current_request_id) { new_store }
   end
 
   # Internal: The current request is inferred from the current thread. It's very

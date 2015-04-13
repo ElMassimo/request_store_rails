@@ -110,7 +110,16 @@ ThreadWithContext.new {
 The gem does not provide such construct to avoid name collisions, you are free
 to reuse the snippet above and adjust it to match your use case.
 
-If you are feeling adventurous, you could try using this [fire and forget script](https://gist.github.com/ElMassimo/e2f99848db6a415f1aaa) and make all of your threads request aware, or should I say _prepend and forget_ :smile:? Probably not something to be used in a production environment, but whatever floats your boat :boat:
+If you are feeling adventurous, you could try using this [fire and forget script](https://gist.github.com/ElMassimo/e2f99848db6a415f1aaa) and make all of your threads request aware, or
+should I say _prepend and forget_ :smile:? Probably not something to be used in
+a production environment, but whatever floats your boat :boat:
+
+### Atomicity
+Have in mind that the `RequestLocals.fetch(:foo) { 'default' }` operation is
+[atomic](https://github.com/ElMassimo/request_store_rails/blob/master/lib/request_locals.rb#L62),
+while `RequestLocal[:foo] ||= 'default'` is not. In most scenarios, there is not
+a lot of difference, but if you are in a concurrent environment make sure to
+use the one that is more suitable for your use case :wink:
 
 ## Special Thanks
 The inspiration for this gem, tests, and a big part of the readme were borrowed

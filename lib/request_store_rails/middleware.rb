@@ -1,8 +1,9 @@
 require 'securerandom'
 
-# Public: Middleware that takes care of setting the thread-local variable
-# :request_id, which enables RequestLocals to associate threads and requests.
 module RequestStoreRails
+
+  # Public: Middleware that takes care of setting the thread-local variable
+  # :request_id, which enables RequestLocals to associate threads and requests.
   class Middleware
 
     def initialize(app)

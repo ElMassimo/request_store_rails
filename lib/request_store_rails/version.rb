@@ -1,5 +1,4 @@
-# Public: Version of the gem.
 module RequestStoreRails
 
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 end
