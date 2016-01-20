@@ -28,7 +28,7 @@ class RequestLocals
   end
 
   # Create cache using reentrant mutex. That's fetch call to be nested.
-  class Cache < Concurrent::Collection::MriMapBackend
+  class RequestCache < Concurrent::Map
     def initialize(options = nil)
       super(options)
       @write_lock = Monitor.new
@@ -39,7 +39,7 @@ class RequestLocals
   def_delegators :store, :[], :[]=, :delete, :empty?
 
   def initialize
-    @cache = Cache.new
+    @cache = RequestCache.new
   end
 
   # Public: Removes all the request-local variables.
@@ -53,7 +53,7 @@ class RequestLocals
   #
   # Returns nothing.
   def clear_all!
-    @cache = Cache.new
+    @cache = RequestCache.new
   end
 
   # Public: Checks if a value was stored for the given key.
@@ -92,6 +92,6 @@ protected
   # Internal: Returns a new empty structure where the request-local variables
   # will be stored.
   def new_store
-    Cache.new
+    RequestCache.new
   end
 end
