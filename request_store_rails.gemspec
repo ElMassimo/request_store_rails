@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'minitest', '~> 5.0'
 
-  s.add_runtime_dependency 'thread_safe', ['~> 0.3', '>= 0.3.5']
+  s.add_runtime_dependency 'concurrent-ruby', ['~> 1.0.0']
 end
