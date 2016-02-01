@@ -1,6 +1,11 @@
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+
+require 'request_store_rails/version'
+
 Gem::Specification.new do |s|
   s.name = 'request_store_rails'
-  s.version = '0.0.3'
+  s.version = RequestStoreRails::VERSION
   s.licenses = ['MIT']
   s.summary = 'Per-request global storage for Rails'
   s.description = 'RequestLocals gives you per-request global storage in Rails'
@@ -19,5 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake'
   s.add_development_dependency 'minitest', '~> 5.0'
 
-  s.add_runtime_dependency 'concurrent-ruby', ['~> 1.0.0']
+  s.add_runtime_dependency 'concurrent-ruby', ['~> 1.0']
 end

@@ -1,3 +1,8 @@
+## RequestLocals 1.0.0 (February 1, 2016) ##
+
+*   Update internal cache to use a monitor-locked concurrent map from [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby), which [supports nested `fetch` calls](https://github.com/ElMassimo/request_store_rails/pull/1). Thanks @Weihrauch!
+
+
 ## RequestLocals 0.0.3 (April 13, 2015) ##
 
 *   Removed the dependency for ActiveSupport in favour of Forwardable.

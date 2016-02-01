@@ -48,6 +48,13 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_equal 2, RequestLocals.fetch(:foo) { 2 + 2 }
   end
 
+  def test_nested_fetch
+    RequestLocals.clear!
+    assert_equal 42, RequestLocals.store.fetch(:bar) { 40 + RequestLocals.fetch(:foo) { 2 } }
+    assert_equal 2, RequestLocals.store.fetch(:foo) { raise 'not executed' }
+    assert_equal 42, RequestLocals.store.fetch(:bar) { raise 'not executed' }
+  end
+
   def test_store_per_request
     RequestLocals.clear_all!
     assert_empty global_store
@@ -94,11 +101,6 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_nil global_store[:different_id]
   end
 
-  def test_nested_fetch
-    RequestLocals.clear!
-    assert_equal 2, RequestLocals.store.fetch(:bar) { 1 + RequestLocals.fetch(:foo){ 1 } }
-    assert_equal 2, RequestLocals.store.fetch(:bar) { 1 + RequestLocals.fetch(:foo){ 1 } }
-  end
 private
 
   def global_store
