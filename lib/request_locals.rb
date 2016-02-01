@@ -1,6 +1,6 @@
 require 'singleton'
 require 'forwardable'
-require 'thread_safe'
+require 'concurrent'
 
 # Public: Provides per-request global storage, by offering an interface that is
 # very similar to Rails.cache, or Hash.
@@ -27,11 +27,19 @@ class RequestLocals
     private :instance
   end
 
+  # Create cache using reentrant mutex. That's fetch call to be nested.
+  class RequestCache < Concurrent::Map
+    def initialize(options = nil)
+      super(options)
+      @write_lock = Monitor.new
+    end
+  end
+
   # Internal: Methods of the RequestLocals instance, delegated to the request-local structure.
   def_delegators :store, :[], :[]=, :delete, :empty?
 
   def initialize
-    @cache = ThreadSafe::Cache.new
+    @cache = RequestCache.new
   end
 
   # Public: Removes all the request-local variables.
@@ -45,7 +53,7 @@ class RequestLocals
   #
   # Returns nothing.
   def clear_all!
-    @cache = ThreadSafe::Cache.new
+    @cache = RequestCache.new
   end
 
   # Public: Checks if a value was stored for the given key.
@@ -84,6 +92,6 @@ protected
   # Internal: Returns a new empty structure where the request-local variables
   # will be stored.
   def new_store
-    ThreadSafe::Cache.new
+    RequestCache.new
   end
 end

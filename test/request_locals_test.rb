@@ -94,6 +94,11 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_nil global_store[:different_id]
   end
 
+  def test_nested_fetch
+    RequestLocals.clear!
+    assert_equal 2, RequestLocals.store.fetch(:bar) { 1 + RequestLocals.fetch(:foo){ 1 } }
+    assert_equal 2, RequestLocals.store.fetch(:bar) { 1 + RequestLocals.fetch(:foo){ 1 } }
+  end
 private
 
   def global_store
