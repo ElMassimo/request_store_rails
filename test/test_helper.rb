@@ -3,8 +3,10 @@ require 'pry'
 require 'minitest/reporters'
 Minitest::Reporters.use!
 
-require 'codeclimate-test-reporter'
-CodeClimate::TestReporter.start
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/test/'
+end
 
 class RackApp
   attr_reader :last_value

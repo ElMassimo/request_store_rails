@@ -2,12 +2,10 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'coveralls', require: false
-
 group :test do
   gem 'pry'
   gem 'minitest-reporters'
-  gem 'codeclimate-test-reporter', require: nil
+  gem 'codeclimate-test-reporter', '~> 1.0.0'
 end
 
 group :doc do
