@@ -18,7 +18,7 @@ class RequestLocals
     extend Forwardable
 
     # Public: Public methods of RequestLocals, they are delegated to the Singleton instance.
-    def_delegators :instance, :clear!, :clear_all!, :[], :[]=, :fetch, :delete, :exist?, :empty?
+    def_delegators :instance, :clear!, :clear_all!, :[], :[]=, :fetch, :delete, :exist?, :key?, :empty?
 
     # Public: There is no accounting for taste, RequestLocals[:foo] vs RequestLocals.store[:foo]
     alias_method :store, :instance
@@ -62,6 +62,9 @@ class RequestLocals
   def exist?(key)
     store.key?(key)
   end
+
+  # Public: Alias to exist?
+  alias_method :key?, :exist?
 
   # Public: Implements fetch in a consistent way with Rails.cache, persisting
   # the value yielded by the block if the key was not found.

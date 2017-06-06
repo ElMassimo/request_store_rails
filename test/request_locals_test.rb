@@ -18,6 +18,13 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     refute RequestLocals.exist?(:foo)
   end
 
+  def test_key_and_delete
+    RequestLocals[:foo] = :bar
+    assert RequestLocals.store.key?(:foo)
+    RequestLocals.delete(:foo)
+    refute RequestLocals.key?(:foo)
+  end
+
   def test_clear
     RequestLocals.store[:foo] = :bar
     refute_empty RequestLocals.store
