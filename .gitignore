@@ -3,3 +3,5 @@
 
 coverage.data/
 coverage/
+
+Gemfile\.lock

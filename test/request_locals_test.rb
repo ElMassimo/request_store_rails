@@ -2,6 +2,8 @@ require 'minitest/autorun'
 
 require 'request_store_rails'
 
+require_relative 'test_helper'
+
 class RequestLocalsTest < Minitest::Unit::TestCase
 
   def test_initial_state
@@ -14,6 +16,13 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert RequestLocals.store.exist?(:foo)
     RequestLocals.delete(:foo)
     refute RequestLocals.exist?(:foo)
+  end
+
+  def test_key_and_delete
+    RequestLocals[:foo] = :bar
+    assert RequestLocals.store.key?(:foo)
+    RequestLocals.delete(:foo)
+    refute RequestLocals.key?(:foo)
   end
 
   def test_clear
