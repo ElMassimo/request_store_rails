@@ -2,6 +2,8 @@ require 'minitest/autorun'
 
 require 'request_store_rails'
 
+require_relative 'test_helper'
+
 class RequestLocalsTest < Minitest::Unit::TestCase
 
   def test_initial_state
