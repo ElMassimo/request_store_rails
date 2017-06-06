@@ -121,6 +121,18 @@ while `RequestLocal[:foo] ||= 'default'` is not. In most scenarios, there is not
 a lot of difference, but if you are in a concurrent environment make sure to
 use the one that is more suitable for your use case :wink:
 
+## Replacing `request_store`
+While the plan is not to achieve 100% compatibility, this gem usually works well
+as a drop-in replacement. If you are using gems that rely on `RequestStore` but
+for some reason you need them to use the appropriate request/thread scope, you
+can try something like this on `application.rb` or similar:3
+```ruby
+if RequestStore != RequestLocals
+  RequestStore::Railtie.initializers.clear
+  Kernel.suppress_warnings { RequestStore = RequestLocals }
+end
+```
+
 ## Special Thanks
 The inspiration for this gem, tests, and a big part of the readme were borrowed
 from the really cool [`request_store`](https://github.com/steveklabnik/request_store) gem.

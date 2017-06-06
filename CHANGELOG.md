@@ -1,3 +1,7 @@
+## RequestLocals 1.0.3 (2017-06-06) ##
+
+*   Improve API compatibility with `request_store` by adding `key?` and `exist?`. Thanks [@abrisse](https://github.com/abrisse)!
+
 ## RequestLocals 1.0.2 (2017-01-25) ##
 
 *   Remove Rails deprecation warning for `ActionDispatch::Reloader`. Thanks [@abrisse](https://github.com/abrisse)!
