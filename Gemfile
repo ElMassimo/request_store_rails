@@ -5,7 +5,7 @@ gemspec
 group :test do
   gem 'pry'
   gem 'minitest-reporters'
-  gem 'codeclimate-test-reporter', '~> 1.0.0'
+  gem 'codeclimate-test-reporter'
 end
 
 group :doc do

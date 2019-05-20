@@ -77,11 +77,11 @@ use RequestStoreRails::Middleware
 ```
 
 ## Multi-Threading
-The middleware in the gem sets a thread-local variable `:request_id` in
+The middleware in the gem sets a thread-local variable `:request_store_id` in
 `Thread.current` for the main thread that is executing the request.
 
 If you need to spawn threads within a server that is already using thread-based
-concurrency, all you need to do is to make sure that the `:request_id`
+concurrency, all you need to do is to make sure that the `:request_store_id`
 variable is set for your threads, and you will be able to access the
 `RequestLocals` as usual.
 
@@ -93,9 +93,9 @@ class ThreadWithContext
 
   # Public: Returns a new Thread that preserves the context of the current request.
   def ThreadWithContext.new(*args)
-    request_id = Thread.current[:request_id]
+    store_id = RequestLocals.current_store_id
     Thread.new {
-      Thread.current[:request_id] = request_id
+      RequestLocals.set_current_store_id(store_id)
       yield *args
     }
   end
@@ -130,6 +130,35 @@ can try something like this on `application.rb` or similar:3
 if RequestStore != RequestLocals
   RequestStore::Railtie.initializers.clear
   Kernel.suppress_warnings { RequestStore = RequestLocals }
+end
+```
+
+## Usage in Sidekiq
+If your code depends on these global variables, it's likely that you'll need
+to avoid collisions in Sidekiq workers (which would happen if the current store
+id is `nil`).
+
+You can use the following middleware, using the job id to identify the store:
+
+```ruby
+class Sidekiq::Middleware::Server::RequestStoreRails
+  def call(_worker, job, _queue)
+    RequestLocals.set_current_store_id(job['jid'])
+    yield
+  ensure
+    RequestLocals.clear!
+    RequestLocals.set_current_store_id(nil)
+  end
+end
+```
+
+Make sure to configure it as server middleware:
+
+```ruby
+Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add Sidekiq::Middleware::Server::RequestStoreRails
+  end
 end
 ```
 

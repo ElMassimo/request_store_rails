@@ -1,3 +1,7 @@
+## RequestLocals 2.0.0 (2019-05-20) ##
+
+*   Always use a random uuid to identify the request in the store. Thanks [@gtmax](https://github.com/gtmax)!
+
 ## RequestLocals 1.0.3 (2017-06-06) ##
 
 *   Improve API compatibility with `request_store` by adding `key?` and `exist?`. Thanks [@abrisse](https://github.com/abrisse)!

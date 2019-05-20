@@ -5,8 +5,8 @@ require 'concurrent'
 # Public: Provides per-request global storage, by offering an interface that is
 # very similar to Rails.cache, or Hash.
 #
-# The store may be shared between threads, as long as the :request_id
-# thread-local variable is set.
+# The store may be shared between threads, as long as the current store id is
+# set as a thread-local variable.
 #
 # Intended to work in collaboration with the RequestStoreRails middleware, that
 # will clear the request local variables after each request.
@@ -14,11 +14,15 @@ class RequestLocals
   include Singleton
   extend Forwardable
 
+  # Internal: The key of the thread-local variable the library uses to store the
+  # identifier of the current store, used during the request lifecycle.
+  REQUEST_STORE_ID = :request_store_id
+
   class << self
     extend Forwardable
 
     # Public: Public methods of RequestLocals, they are delegated to the Singleton instance.
-    def_delegators :instance, :clear!, :clear_all!, :[], :[]=, :fetch, :delete, :exist?, :key?, :empty?
+    def_delegators :instance, :clear!, :clear_all!, :current_store_id, :[], :[]=, :fetch, :delete, :exist?, :key?, :empty?
 
     # Public: There is no accounting for taste, RequestLocals[:foo] vs RequestLocals.store[:foo]
     alias_method :store, :instance
@@ -46,7 +50,7 @@ class RequestLocals
   #
   # Returns nothing.
   def clear!
-    @cache.delete(current_request_id)
+    @cache.delete(current_store_id)
   end
 
   # Public: Clears all the request-local variable stores.
@@ -75,6 +79,19 @@ class RequestLocals
     store.compute_if_absent(key, &block)
   end
 
+  # Public: The current request is inferred from the current thread.
+  #
+  # NOTE: It's very important to set the current store id when spawning new
+  # threads within a single request, using `RequestLocals.set_current_store_id`.
+  def current_store_id
+    Thread.current[REQUEST_STORE_ID]
+  end
+
+  # Public: Changes the store RequestLocals will read from in the current thread.
+  def self.set_current_store_id(id)
+    Thread.current[REQUEST_STORE_ID] = id
+  end
+
 protected
 
   # Internal: Returns the structure that holds the request-local variables for
@@ -82,14 +99,7 @@ protected
   #
   # Returns a ThreadSafe::Cache.
   def store
-    @cache.compute_if_absent(current_request_id) { new_store }
-  end
-
-  # Internal: The current request is inferred from the current thread. It's very
-  # important to pass on the :request_id thread local variable when spawning new
-  # threads within a single request.
-  def current_request_id
-    Thread.current[:request_id]
+    @cache.compute_if_absent(current_store_id) { new_store }
   end
 
   # Internal: Returns a new empty structure where the request-local variables

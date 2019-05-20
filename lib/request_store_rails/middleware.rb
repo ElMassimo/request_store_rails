@@ -2,29 +2,33 @@ require 'securerandom'
 
 module RequestStoreRails
 
-  # Public: Middleware that takes care of setting the thread-local variable
-  # :request_id, which enables RequestLocals to associate threads and requests.
+  # Public: Middleware that takes care of setting a thread-local variable, which
+  # enables RequestLocals to associate threads with the store for a request.
   class Middleware
 
     def initialize(app)
       @app = app
     end
 
-    # Internal: Assigns the :request_id thread-local variable, and cleans up all
-    # the request-local variables after the request.
+    # Internal: Assigns a thread-local variable to identify the current store,
+    # and cleans up all the variables stored for the request once it finishes.
     def call(env)
-      Thread.current[:request_id] = extract_request_id(env)
+      RequestLocals.set_current_store_id(extract_request_id(env))
       @app.call(env)
     ensure
       RequestLocals.clear!
-      Thread.current[:request_id] = nil
+      RequestLocals.set_current_store_id(nil)
     end
 
   protected
 
     # Internal: Extracts the request id from the environment, or generates one.
+    #
+    # NOTE: We always generate an id to prevent accidental conflicts from an
+    # externally provided one, but subclasses of this middleware might override
+    # it.
     def extract_request_id(env)
-      env['action_dispatch.request_id'] || env['HTTP_X_REQUEST_ID'] || SecureRandom.hex(16)
+      SecureRandom.uuid
     end
   end
 end

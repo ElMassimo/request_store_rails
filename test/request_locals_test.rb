@@ -7,8 +7,9 @@ require_relative 'test_helper'
 class RequestLocalsTest < Minitest::Unit::TestCase
 
   def test_initial_state
-    Thread.current[:request_id] = :random_id
+    RequestLocals.set_current_store_id(:random_id)
     assert_empty RequestLocals.store
+    assert RequestLocals.current_store_id
   end
 
   def test_exist_and_delete
@@ -68,17 +69,17 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     RequestLocals.clear_all!
     assert_empty global_store
 
-    Thread.current[:request_id] = :awesome_id
+    RequestLocals.set_current_store_id(:awesome_id)
     RequestLocals[:foo] = :bar
 
     Thread.new {
       assert_empty RequestLocals.store
       RequestLocals[:foo] = :mar
 
-      Thread.current[:request_id] = :awesome_id
+      RequestLocals.set_current_store_id(:awesome_id)
       assert_equal :bar, RequestLocals.store[:foo]
 
-      Thread.current[:request_id] = :different_id
+      RequestLocals.set_current_store_id(:different_id)
       assert_empty RequestLocals.store
 
       RequestLocals.fetch(:foo) { :beer }
@@ -93,14 +94,14 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     RequestLocals.clear_all!
     assert_empty global_store
 
-    Thread.current[:request_id] = :awesome_id
+    RequestLocals.set_current_store_id(:awesome_id)
     RequestLocals.fetch(:foo) { :bar }
 
     Thread.new {
-      Thread.current[:request_id] = :awesome_id
+      RequestLocals.set_current_store_id(:awesome_id)
       RequestLocals[:foo] = :beer
 
-      Thread.current[:request_id] = :different_id
+      RequestLocals.set_current_store_id(:different_id)
       RequestLocals[:foo] = :mar
       RequestLocals.clear!
     }.join

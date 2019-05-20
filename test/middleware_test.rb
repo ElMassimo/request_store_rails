@@ -9,7 +9,7 @@ class MiddlewareTest < Minitest::Unit::TestCase
     @app = RackApp.new
     @middleware = RequestStoreRails::Middleware.new(@app)
 
-    Thread.current[:request_id] = nil
+    RequestLocals.set_current_store_id(nil)
     RequestLocals.clear_all!
   end
 
