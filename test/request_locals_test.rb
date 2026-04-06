@@ -90,6 +90,32 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_equal :mar, global_store[nil][:foo]
   end
 
+  def test_uses_isolated_execution_state_when_available
+    if defined?(ActiveSupport::IsolatedExecutionState)
+      assert_equal ActiveSupport::IsolatedExecutionState, RequestLocals.context
+    else
+      assert_equal Thread.current, RequestLocals.context
+    end
+  end
+
+  def test_inherits_store_id_in_nested_fibers_when_available
+    skip 'Fiber storage is not supported in this ruby' unless Fiber.respond_to?(:[])
+    skip 'Requires ActiveSupport::IsolatedExecutionState' unless defined?(ActiveSupport::IsolatedExecutionState)
+
+    previous_level = ActiveSupport::IsolatedExecutionState.isolation_level
+    ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
+
+    RequestLocals.set_current_store_id(:parent_request_id)
+    inherited_id = Fiber.new {
+      RequestLocals.current_store_id
+    }.resume
+
+    assert_equal :parent_request_id, inherited_id
+  ensure
+    ActiveSupport::IsolatedExecutionState.isolation_level = previous_level if defined?(previous_level) && previous_level
+    RequestLocals.set_current_store_id(nil)
+  end
+
   def test_clear_per_request
     RequestLocals.clear_all!
     assert_empty global_store
