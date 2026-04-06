@@ -112,7 +112,7 @@ class RequestLocalsTest < Minitest::Test
 
     assert_equal :parent_request_id, inherited_id
   ensure
-    ActiveSupport::IsolatedExecutionState.isolation_level = previous_level if defined?(previous_level) && previous_level
+    ActiveSupport::IsolatedExecutionState.isolation_level = previous_level if previous_level
     RequestLocals.set_current_store_id(nil)
   end
 

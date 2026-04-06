@@ -1,7 +1,7 @@
 ## RequestLocals 2.1.0 (unreleased) ##
 
 *   Use `ActiveSupport::IsolatedExecutionState` for request context when available so execution state can be inherited where supported.
-*   Require `activesupport >= 7.0` to ensure isolate context support is available.
+*   Require `activesupport >= 7.0` to ensure isolated context support is available.
 
 ## RequestLocals 2.0.0 (2019-05-20) ##
 
