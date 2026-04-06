@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.0'
 
   s.add_runtime_dependency 'concurrent-ruby', ['~> 1.0']
+  s.add_runtime_dependency 'activesupport', ['>= 7.0']
 end

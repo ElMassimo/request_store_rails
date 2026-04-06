@@ -84,12 +84,20 @@ class RequestLocals
   # NOTE: It's very important to set the current store id when spawning new
   # threads within a single request, using `RequestLocals.set_current_store_id`.
   def current_store_id
-    Thread.current[REQUEST_STORE_ID]
+    context[REQUEST_STORE_ID]
   end
 
   # Public: Changes the store RequestLocals will read from in the current thread.
   def self.set_current_store_id(id)
-    Thread.current[REQUEST_STORE_ID] = id
+    context[REQUEST_STORE_ID] = id
+  end
+
+  def self.context
+    if defined?(ActiveSupport::IsolatedExecutionState)
+      ActiveSupport::IsolatedExecutionState
+    else
+      Thread.current
+    end
   end
 
 protected
@@ -100,6 +108,10 @@ protected
   # Returns a ThreadSafe::Cache.
   def store
     @cache.compute_if_absent(current_store_id) { new_store }
+  end
+
+  def context
+    self.class.context
   end
 
   # Internal: Returns a new empty structure where the request-local variables

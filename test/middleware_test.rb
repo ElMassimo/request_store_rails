@@ -4,7 +4,7 @@ require 'request_store_rails'
 
 require_relative 'test_helper'
 
-class MiddlewareTest < Minitest::Unit::TestCase
+class MiddlewareTest < Minitest::Test
   def setup
     @app = RackApp.new
     @middleware = RequestStoreRails::Middleware.new(@app)
