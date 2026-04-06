@@ -14,8 +14,6 @@ class RequestLocals
   include Singleton
   extend Forwardable
 
-  REQUEST_LOCALS_STORE = :request_locals_store
-
   # Internal: The key of the thread-local variable the library uses to store the
   # identifier of the current store, used during the request lifecycle.
   REQUEST_STORE_ID = :request_store_id

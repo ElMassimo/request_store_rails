@@ -4,7 +4,7 @@ require 'request_store_rails'
 
 require_relative 'test_helper'
 
-class RequestLocalsTest < Minitest::Unit::TestCase
+class RequestLocalsTest < Minitest::Test
 
   def test_initial_state
     RequestLocals.set_current_store_id(:random_id)
