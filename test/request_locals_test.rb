@@ -95,31 +95,20 @@ class RequestLocalsTest < Minitest::Test
     assert_equal ActiveSupport::IsolatedExecutionState, RequestLocals.context
   end
 
-  def test_keeps_store_id_in_the_legacy_thread_local
+  def test_stores_id_in_the_isolated_execution_state
     RequestLocals.set_current_store_id(:request_id)
 
-    assert_equal :request_id, Thread.current[RequestLocals::REQUEST_STORE_ID]
+    assert_equal :request_id, RequestLocals.context[RequestLocals::REQUEST_STORE_ID]
   ensure
     RequestLocals.set_current_store_id(nil)
   end
 
-  def test_reads_uninitialized_store_id_from_the_legacy_thread_local
+  def test_removes_id_from_the_isolated_execution_state
+    RequestLocals.set_current_store_id(:request_id)
     RequestLocals.set_current_store_id(nil)
-    Thread.current[RequestLocals::REQUEST_STORE_ID] = :legacy_request_id
 
-    assert_equal :legacy_request_id, RequestLocals.current_store_id
-    refute RequestLocals.context.key?(RequestLocals::ISOLATED_REQUEST_STORE_ID)
-  ensure
-    RequestLocals.set_current_store_id(nil)
-  end
-
-  def test_isolated_store_id_takes_precedence_over_the_legacy_thread_local
-    RequestLocals.set_current_store_id(:isolated_request_id)
-    Thread.current[RequestLocals::REQUEST_STORE_ID] = :legacy_request_id
-
-    assert_equal :isolated_request_id, RequestLocals.current_store_id
-  ensure
-    RequestLocals.set_current_store_id(nil)
+    refute RequestLocals.context.key?(RequestLocals::REQUEST_STORE_ID)
+    assert_nil RequestLocals.current_store_id
   end
 
   def test_shares_store_id_with_nested_fibers_when_thread_isolated
