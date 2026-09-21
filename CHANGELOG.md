@@ -1,6 +1,6 @@
 ## RequestLocals 2.1.0 (unreleased) ##
 
-*   Use `ActiveSupport::IsolatedExecutionState` for request context when available so execution state can be inherited where supported.
+*   Use `ActiveSupport::IsolatedExecutionState` so request context follows Rails' configured thread or fiber isolation level.
 *   Require `activesupport >= 7.0` to ensure isolated context support is available.
 
 ## RequestLocals 2.0.0 (2019-05-20) ##

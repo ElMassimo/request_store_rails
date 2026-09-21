@@ -1,6 +1,7 @@
 require 'singleton'
 require 'forwardable'
 require 'concurrent'
+require 'active_support/isolated_execution_state'
 
 # Public: Provides per-request global storage, by offering an interface that is
 # very similar to Rails.cache, or Hash.
@@ -17,6 +18,12 @@ class RequestLocals
   # Internal: The key of the thread-local variable the library uses to store the
   # identifier of the current store, used during the request lifecycle.
   REQUEST_STORE_ID = :request_store_id
+
+  # Internal: The execution-state key used for the request identifier.
+  ISOLATED_REQUEST_STORE_ID = :request_store_rails_store_id
+
+  # Internal: The execution-state backend used for the request identifier.
+  CONTEXT = ActiveSupport::IsolatedExecutionState
 
   class << self
     extend Forwardable
@@ -79,25 +86,28 @@ class RequestLocals
     store.compute_if_absent(key, &block)
   end
 
-  # Public: The current request is inferred from the current thread.
+  # Public: The current request is inferred from the current execution context.
   #
   # NOTE: It's very important to set the current store id when spawning new
   # threads within a single request, using `RequestLocals.set_current_store_id`.
   def current_store_id
-    context[REQUEST_STORE_ID]
+    if Thread.current.key?(REQUEST_STORE_ID)
+      id = Thread.current[REQUEST_STORE_ID]
+      context[ISOLATED_REQUEST_STORE_ID] = id
+      id
+    else
+      context[ISOLATED_REQUEST_STORE_ID]
+    end
   end
 
-  # Public: Changes the store RequestLocals will read from in the current thread.
+  # Public: Changes the store RequestLocals will read from in the current execution context.
   def self.set_current_store_id(id)
-    context[REQUEST_STORE_ID] = id
+    Thread.current[REQUEST_STORE_ID] = id
+    context[ISOLATED_REQUEST_STORE_ID] = id
   end
 
   def self.context
-    if defined?(ActiveSupport::IsolatedExecutionState)
-      ActiveSupport::IsolatedExecutionState
-    else
-      Thread.current
-    end
+    CONTEXT
   end
 
 protected
