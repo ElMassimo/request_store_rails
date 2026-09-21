@@ -67,13 +67,14 @@ change it to `RequestLocals.store`. Now your variables will actually be stored
 in a true _request-local_ way.
 
 ## Multi-Threading
-The middleware in the gem sets a thread-local variable `:request_store_id` in
-`Thread.current` for the main thread that is executing the request.
+The middleware stores each request's context in
+`ActiveSupport::IsolatedExecutionState`, the same mechanism used by Rails'
+`CurrentAttributes`. Existing `RequestLocals` usage automatically follows the
+thread or fiber isolation level configured by Rails, without application changes.
 
-If you need to spawn threads within a server that is already using thread-based
-concurrency, all you need to do is to make sure that the `:request_store_id`
-variable is set for your threads, and you will be able to access the
-`RequestLocals` as usual.
+When explicitly spawning a new thread, propagate the current store id with
+`RequestLocals.set_current_store_id` so the new thread can access the same
+request-local values.
 
 A good way to apply this pattern is by encapsulating it into a helper class:
 
