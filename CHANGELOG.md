@@ -1,3 +1,8 @@
+## RequestLocals 3.0.0 (unreleased) ##
+
+*   Use `ActiveSupport::IsolatedExecutionState` so request context follows Rails' configured thread or fiber isolation level.
+*   Require Ruby 2.7 or newer and `activesupport >= 7.0` to ensure isolated context support is available.
+
 ## RequestLocals 2.0.0 (2019-05-20) ##
 
 *   Always use a random uuid to identify the request in the store. Thanks [@gtmax](https://github.com/gtmax)!

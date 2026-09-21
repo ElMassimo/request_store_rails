@@ -2,15 +2,15 @@ require 'securerandom'
 
 module RequestStoreRails
 
-  # Public: Middleware that takes care of setting a thread-local variable, which
-  # enables RequestLocals to associate threads with the store for a request.
+  # Public: Middleware that sets the isolated execution context, which enables
+  # RequestLocals to associate concurrent execution with the store for a request.
   class Middleware
 
     def initialize(app)
       @app = app
     end
 
-    # Internal: Assigns a thread-local variable to identify the current store,
+    # Internal: Assigns the execution context that identifies the current store,
     # and cleans up all the variables stored for the request once it finishes.
     def call(env)
       RequestLocals.set_current_store_id(extract_request_id(env))

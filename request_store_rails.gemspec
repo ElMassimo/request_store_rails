@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{https://github.com/ElMassimo/request_store_rails}
 
   s.platform = Gem::Platform::RUBY
-  s.required_ruby_version = '>=1.9.3'
+  s.required_ruby_version = '>=2.7'
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
 
@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.0'
 
   s.add_runtime_dependency 'concurrent-ruby', ['~> 1.0']
+  s.add_runtime_dependency 'activesupport', ['>= 7.0']
 end

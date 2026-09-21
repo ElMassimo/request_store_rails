@@ -1,12 +1,13 @@
 require 'singleton'
 require 'forwardable'
 require 'concurrent'
+require 'active_support/isolated_execution_state'
 
 # Public: Provides per-request global storage, by offering an interface that is
 # very similar to Rails.cache, or Hash.
 #
-# The store may be shared between threads, as long as the current store id is
-# set as a thread-local variable.
+# The store may be shared between execution contexts by propagating the current
+# store id with `RequestLocals.set_current_store_id`.
 #
 # Intended to work in collaboration with the RequestStoreRails middleware, that
 # will clear the request local variables after each request.
@@ -14,9 +15,11 @@ class RequestLocals
   include Singleton
   extend Forwardable
 
-  # Internal: The key of the thread-local variable the library uses to store the
-  # identifier of the current store, used during the request lifecycle.
-  REQUEST_STORE_ID = :request_store_id
+  # Internal: The execution-state key used for the request identifier.
+  REQUEST_STORE_ID = :request_store_rails_store_id
+
+  # Internal: The execution-state backend used for the request identifier.
+  CONTEXT = ActiveSupport::IsolatedExecutionState
 
   class << self
     extend Forwardable
@@ -79,17 +82,25 @@ class RequestLocals
     store.compute_if_absent(key, &block)
   end
 
-  # Public: The current request is inferred from the current thread.
+  # Public: The current request is inferred from the current execution context.
   #
   # NOTE: It's very important to set the current store id when spawning new
   # threads within a single request, using `RequestLocals.set_current_store_id`.
   def current_store_id
-    Thread.current[REQUEST_STORE_ID]
+    context[REQUEST_STORE_ID]
   end
 
-  # Public: Changes the store RequestLocals will read from in the current thread.
+  # Public: Changes the store RequestLocals will read from in the current execution context.
   def self.set_current_store_id(id)
-    Thread.current[REQUEST_STORE_ID] = id
+    if id.nil?
+      context.delete(REQUEST_STORE_ID)
+    else
+      context[REQUEST_STORE_ID] = id
+    end
+  end
+
+  def self.context
+    CONTEXT
   end
 
 protected
@@ -100,6 +111,10 @@ protected
   # Returns a ThreadSafe::Cache.
   def store
     @cache.compute_if_absent(current_store_id) { new_store }
+  end
+
+  def context
+    self.class.context
   end
 
   # Internal: Returns a new empty structure where the request-local variables

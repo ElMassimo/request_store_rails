@@ -4,7 +4,7 @@ require 'request_store_rails'
 
 require_relative 'test_helper'
 
-class RequestLocalsTest < Minitest::Unit::TestCase
+class RequestLocalsTest < Minitest::Test
 
   def test_initial_state
     RequestLocals.set_current_store_id(:random_id)
@@ -88,6 +88,53 @@ class RequestLocalsTest < Minitest::Unit::TestCase
     assert_equal :bar, global_store[:awesome_id][:foo]
     assert_equal :beer, global_store[:different_id][:foo]
     assert_equal :mar, global_store[nil][:foo]
+  end
+
+  def test_loads_isolated_execution_state
+    assert defined?(ActiveSupport::IsolatedExecutionState)
+    assert_equal ActiveSupport::IsolatedExecutionState, RequestLocals.context
+  end
+
+  def test_stores_id_in_the_isolated_execution_state
+    RequestLocals.set_current_store_id(:request_id)
+
+    assert_equal :request_id, RequestLocals.context[RequestLocals::REQUEST_STORE_ID]
+  ensure
+    RequestLocals.set_current_store_id(nil)
+  end
+
+  def test_removes_id_from_the_isolated_execution_state
+    RequestLocals.set_current_store_id(:request_id)
+    RequestLocals.set_current_store_id(nil)
+
+    refute RequestLocals.context.key?(RequestLocals::REQUEST_STORE_ID)
+    assert_nil RequestLocals.current_store_id
+  end
+
+  def test_shares_store_id_with_nested_fibers_when_thread_isolated
+    previous_level = ActiveSupport::IsolatedExecutionState.isolation_level
+    ActiveSupport::IsolatedExecutionState.isolation_level = :thread
+    RequestLocals.set_current_store_id(:parent_request_id)
+
+    nested_id = Fiber.new { RequestLocals.current_store_id }.resume
+
+    assert_equal :parent_request_id, nested_id
+  ensure
+    ActiveSupport::IsolatedExecutionState.isolation_level = previous_level if previous_level
+    RequestLocals.set_current_store_id(nil)
+  end
+
+  def test_isolates_store_id_from_nested_fibers_when_fiber_isolated
+    previous_level = ActiveSupport::IsolatedExecutionState.isolation_level
+    ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
+    RequestLocals.set_current_store_id(:parent_request_id)
+
+    nested_id = Fiber.new { RequestLocals.current_store_id }.resume
+
+    assert_nil nested_id
+  ensure
+    ActiveSupport::IsolatedExecutionState.isolation_level = previous_level if previous_level
+    RequestLocals.set_current_store_id(nil)
   end
 
   def test_clear_per_request

@@ -9,20 +9,10 @@ RequestLocals
 
 If you have ever needed to use a global variable in Rails, you know it sucks.
 
-One of the usual tricks is to go for `Thread.current`, or if you have done your
-homework, to use the awesome [`request_store`](https://github.com/steveklabnik/request_store).
+One common solution is the awesome
+[`request_store`](https://github.com/steveklabnik/request_store):
 
 ```ruby
-# Using Thread.current
-def self.foo
-  Thread.current[:foo] ||= 0
-end
-
-def self.foo=(value)
-  Thread.current[:foo] = value
-end
-
-# Using RequestStore
 def self.foo
   RequestStore.fetch(:foo) { 0 }
 end
@@ -34,13 +24,8 @@ end
 
 ### The problem
 
-- Using `Thread.current`, values can stick around even after the request is over,
-since some servers have a pool of Threads that they reuse, which [can cause bugs](https://github.com/steveklabnik/request_store#the-problem).
-
-- Using `request_store`, the storage is _*not actually*_ request local. Variables
-are stored in `Thread.current`, except that the storage is cleared after each
-request. However, this does not work when you need to use multiple threads per
-request, _different_ threads access _different_ stores.
+`request_store` scopes values to the execution context handling the request.
+When work moves to another thread, that thread accesses a different store.
 
 ### The solution
 
@@ -62,28 +47,18 @@ def self.foo=(value)
 end
 ```
 
-Oh yeah, everywhere you used `Thread.current` or `RequestStore.store` just
-change it to `RequestLocals.store`. Now your variables will actually be stored
-in a true _request-local_ way.
-
-### No Rails? No Problem!
-
-A Railtie is added that configures the Middleware for you, but if you're not
-using Rails, no biggie! Just use the Middleware yourself, however you need.
-You'll probably have to shove this somewhere:
-
-```ruby
-use RequestStoreRails::Middleware
-```
+Everywhere you used `RequestStore.store`, change it to `RequestLocals.store`.
+Now your variables will actually be stored in a true _request-local_ way.
 
 ## Multi-Threading
-The middleware in the gem sets a thread-local variable `:request_store_id` in
-`Thread.current` for the main thread that is executing the request.
+The middleware stores each request's context in
+`ActiveSupport::IsolatedExecutionState`, the same mechanism used by Rails'
+`CurrentAttributes`. Existing `RequestLocals` usage automatically follows the
+thread or fiber isolation level configured by Rails, without application changes.
 
-If you need to spawn threads within a server that is already using thread-based
-concurrency, all you need to do is to make sure that the `:request_store_id`
-variable is set for your threads, and you will be able to access the
-`RequestLocals` as usual.
+When explicitly spawning a new thread, propagate the current store id with
+`RequestLocals.set_current_store_id` so the new thread can access the same
+request-local values.
 
 A good way to apply this pattern is by encapsulating it into a helper class:
 
