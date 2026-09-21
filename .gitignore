@@ -4,4 +4,6 @@
 coverage.data/
 coverage/
 
+.claude/worktrees/
+
 Gemfile\.lock
