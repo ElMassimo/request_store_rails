@@ -66,16 +66,6 @@ Oh yeah, everywhere you used `Thread.current` or `RequestStore.store` just
 change it to `RequestLocals.store`. Now your variables will actually be stored
 in a true _request-local_ way.
 
-### No Rails? No Problem!
-
-A Railtie is added that configures the Middleware for you, but if you're not
-using Rails, no biggie! Just use the Middleware yourself, however you need.
-You'll probably have to shove this somewhere:
-
-```ruby
-use RequestStoreRails::Middleware
-```
-
 ## Multi-Threading
 The middleware in the gem sets a thread-local variable `:request_store_id` in
 `Thread.current` for the main thread that is executing the request.
