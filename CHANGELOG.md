@@ -1,7 +1,7 @@
-## RequestLocals 2.1.0 (unreleased) ##
+## RequestLocals 3.0.0 (unreleased) ##
 
 *   Use `ActiveSupport::IsolatedExecutionState` so request context follows Rails' configured thread or fiber isolation level.
-*   Require `activesupport >= 7.0` to ensure isolated context support is available.
+*   Require Ruby 2.7 or newer and `activesupport >= 7.0` to ensure isolated context support is available.
 
 ## RequestLocals 2.0.0 (2019-05-20) ##
 

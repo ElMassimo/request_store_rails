@@ -91,19 +91,22 @@ class RequestLocals
   # NOTE: It's very important to set the current store id when spawning new
   # threads within a single request, using `RequestLocals.set_current_store_id`.
   def current_store_id
-    if Thread.current.key?(REQUEST_STORE_ID)
-      id = Thread.current[REQUEST_STORE_ID]
-      context[ISOLATED_REQUEST_STORE_ID] = id
-      id
-    else
+    if context.key?(ISOLATED_REQUEST_STORE_ID)
       context[ISOLATED_REQUEST_STORE_ID]
+    else
+      Thread.current[REQUEST_STORE_ID]
     end
   end
 
   # Public: Changes the store RequestLocals will read from in the current execution context.
   def self.set_current_store_id(id)
     Thread.current[REQUEST_STORE_ID] = id
-    context[ISOLATED_REQUEST_STORE_ID] = id
+
+    if id.nil?
+      context.delete(ISOLATED_REQUEST_STORE_ID)
+    else
+      context[ISOLATED_REQUEST_STORE_ID] = id
+    end
   end
 
   def self.context
