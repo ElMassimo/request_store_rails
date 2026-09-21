@@ -1,10 +1,9 @@
 RequestLocals
 =====================
-[![Gem Version](https://badge.fury.io/rb/request_store_rails.svg)](http://badge.fury.io/rb/request_store_rails)
-[![Build Status](https://travis-ci.org/ElMassimo/request_store_rails.svg)](https://travis-ci.org/ElMassimo/request_store_rails)
-[![Test Coverage](https://codeclimate.com/github/ElMassimo/request_store_rails/badges/coverage.svg)](https://codeclimate.com/github/ElMassimo/request_store_rails)
-[![Code Climate](https://codeclimate.com/github/ElMassimo/request_store_rails/badges/gpa.svg)](https://codeclimate.com/github/ElMassimo/request_store_rails)
-[![Inline docs](http://inch-ci.org/github/ElMassimo/request_store_rails.svg)](http://inch-ci.org/github/ElMassimo/request_store_rails)
+[![Gem Version](https://badge.fury.io/rb/request_store_rails.svg)](https://badge.fury.io/rb/request_store_rails)
+[![CI](https://github.com/ElMassimo/request_store_rails/actions/workflows/ci.yml/badge.svg)](https://github.com/ElMassimo/request_store_rails/actions/workflows/ci.yml)
+[![Code Coverage](https://qlty.sh/gh/ElMassimo/projects/request_store_rails/coverage.svg)](https://qlty.sh/gh/ElMassimo/projects/request_store_rails)
+[![Maintainability](https://qlty.sh/gh/ElMassimo/projects/request_store_rails/maintainability.svg)](https://qlty.sh/gh/ElMassimo/projects/request_store_rails)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ElMassimo/request_store_rails/blob/master/LICENSE.txt)
 
 If you have ever needed to use a global variable in Rails, you know it sucks.

@@ -1,8 +1,8 @@
+require_relative 'test_helper'
+
 require 'minitest/autorun'
 
 require 'request_store_rails'
-
-require_relative 'test_helper'
 
 class MiddlewareTest < Minitest::Test
   def setup

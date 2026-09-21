@@ -1,12 +1,12 @@
-require 'pry'
-
-require 'minitest/reporters'
-Minitest::Reporters.use!
-
 require 'simplecov'
 SimpleCov.start do
   add_filter '/test/'
 end
+
+require 'pry'
+
+require 'minitest/reporters'
+Minitest::Reporters.use!
 
 class RackApp
   attr_reader :last_value
